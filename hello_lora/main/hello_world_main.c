@@ -3,9 +3,9 @@
 #include "esp_log.h"
 #include "string.h"
 
-#define UART_PORT UART_NUM_0
-#define TXD_PIN GPIO_NUM_21  // D6 (TX to LoRa RX)
-#define RXD_PIN GPIO_NUM_20  // D7 (RX from LoRa TX)
+#define UART_PORT UART_NUM_1
+#define TXD_PIN GPIO_NUM_5  // D6 (TX to LoRa RX)
+#define RXD_PIN GPIO_NUM_4  // D7 (RX from LoRa TX)
 #define BUF_SIZE 128
 
 static const char *TAG = "LORA_HELLO";
@@ -26,7 +26,7 @@ void init_uart() {
 void app_main() {
     init_uart();
 
-    const char* at_cmd = "AT\r\n";
+    const char* at_cmd = "AT+VER?\r\n";
     uart_write_bytes(UART_PORT, at_cmd, strlen(at_cmd));
     ESP_LOGI(TAG, "Sent: %s", (char*)at_cmd);
 
@@ -44,5 +44,6 @@ void app_main() {
     } else {
         ESP_LOGE(TAG, "❌ No response from LoRa module.");
     }
+   
 }
 
