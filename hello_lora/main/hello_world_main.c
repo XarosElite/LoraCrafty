@@ -23,10 +23,18 @@ void init_uart() {
     uart_set_pin(UART_PORT, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 }
 
+void lora_send_cmd(const char *cmd) {
+    char full_cmd[256];
+    snprintf(full_cmd, sizeof(full_cmd), "%s\r\n", cmd);
+    uart_write_bytes(UART_PORT, full_cmd, strlen(full_cmd));
+}
+
+
+
 void app_main() {
     init_uart();
 
-    const char* at_cmd = "AT+VER?\r\n";
+    const char* at_cmd = "AT?\r\n";
     uart_write_bytes(UART_PORT, at_cmd, strlen(at_cmd));
     ESP_LOGI(TAG, "Sent: %s", (char*)at_cmd);
 
@@ -44,6 +52,26 @@ void app_main() {
     } else {
         ESP_LOGE(TAG, "❌ No response from LoRa module.");
     }
+
+    uint8_t data[BUF_SIZE];
+
+    // Set address (optional)
+    lora_send_cmd("AT+ADDRESS=1");
+    vTaskDelay(pdMS_TO_TICKS(500));
+
+    lora_send_cmd("AT+SEND=2,5,Hello");
+
+    while (1) {
+        int len = uart_read_bytes(UART_PORT, data, BUF_SIZE - 1, pdMS_TO_TICKS(1000));
+        if (len > 0) {
+            data[len] = 0;  // Null-terminate
+            ESP_LOGI(TAG, "Received: %s", data);
+        }
+        vTaskDelay(pdMS_TO_TICKS(100));
+    }
+
+
+
    
 }
 
