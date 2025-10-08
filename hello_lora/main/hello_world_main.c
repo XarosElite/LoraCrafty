@@ -24,6 +24,7 @@ void init_uart() {
 }
 
 void lora_send_cmd(const char *cmd) {
+    ESP_LOGI(TAG, "Sent: %s", (char*)cmd);
     char full_cmd[256];
     snprintf(full_cmd, sizeof(full_cmd), "%s\r\n", cmd);
     uart_write_bytes(UART_PORT, full_cmd, strlen(full_cmd));
@@ -59,7 +60,11 @@ void app_main() {
     lora_send_cmd("AT+ADDRESS=1");
     vTaskDelay(pdMS_TO_TICKS(500));
 
-    lora_send_cmd("AT+SEND=2,5,Hello");
+    for (int i = 0; i < 100; i++) {
+        lora_send_cmd("AT+SEND=1,5,Hello");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+    
 
     while (1) {
         int len = uart_read_bytes(UART_PORT, data, BUF_SIZE - 1, pdMS_TO_TICKS(1000));
