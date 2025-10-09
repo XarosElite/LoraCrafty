@@ -2,3 +2,5 @@ build/
 */build/
 hello_lora/sdkconfig
 hello_lora/sdkconfig.old
+
+.vscode/
